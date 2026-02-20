@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Money Laundering Network Detector</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="https://unpkg.com/vis-network@9.1.9/dist/vis-network.min.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <h1>Money Laundering Network Detector</h1>
+        <p>Graph-based Fraud Detection Engine</p>
+      </header>
+
+      <section class="panel controls">
+        <div class="upload-row button-row">
+          <div class="upload-main">
+            <input id="fileInput" class="file-input" type="file" accept=".csv" />
+            <button id="sampleBtn" class="btn btn-neutral" type="button">Use Sample Dataset</button>
+          </div>
+          <div class="upload-actions">
+            <button id="analyzeBtn" class="btn btn-primary">Analyze</button>
+            <span id="analyzeSpinner" class="analyze-spinner" aria-hidden="true"></span>
+            <button id="downloadBtn" class="btn btn-secondary" disabled>Download Suspicious JSON</button>
+          </div>
+        </div>
+        <div id="analysisProgress" class="analysis-progress" aria-hidden="true">
+          <span id="analysisProgressBar"></span>
+        </div>
+        <p class="hint">Required columns: <code>sender</code>, <code>receiver</code>, <code>amount</code>, <code>timestamp</code></p>
+        <div id="status" class="status">Waiting for file...</div>
+      </section>
+
+      <section class="panel summary" id="summaryPanel"></section>
+      <div class="detection-badge">Detection powered by graph analysis + behavioral signals</div>
+
+      <section class="panel graph-panel">
+        <h2 class="section-title">Detected Transaction Network (Graph View)</h2>
+        <div id="graphStateBadge" class="graph-state-badge">Physics enabled</div>
+        <div class="graph-header">
+          <div class="graph-controls">
+            <button id="centerGraphBtn" type="button">Center Graph</button>
+            <button id="pauseGraphBtn" type="button">Pause Physics</button>
+            <label class="explain-toggle">
+              <input id="explainNetworkToggle" type="checkbox" />
+              Explain Network
+            </label>
+            <label class="explain-toggle explain-mode-toggle">
+              <input id="explainModeToggle" type="checkbox" />
+              Explain Mode
+            </label>
+          </div>
+          <div class="graph-legend" aria-label="graph legend">
+            <span class="legend-item suspicious"><span class="dot suspicious"></span> 🔴 High risk account</span>
+            <span class="legend-item timing"><span class="dot timing"></span> 🟠 Timing suspicious account</span>
+            <span class="legend-item ring"><span class="dot ring"></span> 🟣 Ring member</span>
+            <span class="legend-item"><span class="dot normal"></span> 🔵 Normal account</span>
+          </div>
+        </div>
+        <p id="explainText" class="explain-text" hidden>
+          This graph shows how money moves between accounts. Red nodes are suspicious because they show patterns criminals use to hide money.
+        </p>
+        <p class="graph-info">
+          The system automatically detects coordinated fraud rings, abnormal transaction flows, and suspicious timing patterns.
+        </p>
+        <p class="graph-info">
+          Detects coordinated financial fraud by analyzing transaction networks instead of individual transfers.
+        </p>
+        <div id="networkInsights" class="network-insights"></div>
+        <div id="graph"></div>
+        <div id="insightCard" class="insight-card" hidden>
+          <h3>Why this account is suspicious</h3>
+          <p id="insightTextBody">Click a node to view a plain-language explanation.</p>
+          <ul id="insightList"></ul>
+        </div>
+      </section>
+
+      <section class="panel table-panel">
+        <h2 class="section-title">Suspicious Accounts</h2>
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Risk Score</th>
+              <th>Risk Signals</th>
+              <th>Tx Count</th>
+              <th>Total Volume</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="panel table-panel">
+        <h2 class="section-title">Fraud Rings Detected</h2>
+        <table id="ringsTable">
+          <thead>
+            <tr>
+              <th>Ring ID</th>
+              <th>Pattern Type</th>
+              <th>Member Accounts</th>
+              <th>Risk Score</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+    <div id="successToast" class="success-toast" hidden></div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
