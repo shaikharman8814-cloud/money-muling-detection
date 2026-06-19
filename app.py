@@ -28,7 +28,7 @@ class Transaction:
 
 def parse_timestamp(raw_ts: str) -> datetime:
     raw_ts = raw_ts.strip()
-    # Accept common hackathon-friendly formats
+    
     for fmt in (
         "%Y-%m-%d %H:%M:%S",
         "%Y-%m-%dT%H:%M:%S",
@@ -44,7 +44,7 @@ def parse_timestamp(raw_ts: str) -> datetime:
             continue
 
     try:
-        # Best effort for ISO timestamps with timezone variants
+       
         return datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
     except ValueError as exc:
         raise ValueError(f"Unsupported timestamp format: {raw_ts}") from exc
@@ -126,9 +126,9 @@ def detect_fraud_rings(
     seen_keys: set[tuple] = set()
     outgoing_map = {k: sorted(v, key=lambda t: t.timestamp) for k, v in outgoing_by_account.items()}
 
-    # Pattern: A -> B -> C -> A cycle
+
     for tx1 in transactions:
-        for tx2 in outgoing_map.get(tx1.receiver, []):
+        for tx2 in outgoing_map.get(tx1.receiver,[]):
             if tx2.timestamp < tx1.timestamp:
                 continue
             if tx2.timestamp - tx1.timestamp > timedelta(hours=6):
@@ -171,7 +171,7 @@ def detect_fraud_rings(
                 seen_keys.add(key)
                 rings.append({"pattern": "fan_out", "members": members})
 
-    # Pattern: layered chain A -> B -> C -> D within short hops
+ 
     for tx1 in transactions:
         for tx2 in outgoing_map.get(tx1.receiver, []):
             if tx2.timestamp < tx1.timestamp:
@@ -254,7 +254,7 @@ def analyze_transactions(transactions: list[Transaction]) -> dict:
             }
         )
 
-    # Timing rule 1: rapid pass-through transfer.
+
     for account in account_stats.keys():
         incoming_sorted = sorted(incoming_by_account.get(account, []), key=lambda t: t.timestamp)
         outgoing_sorted = sorted(outgoing_by_account.get(account, []), key=lambda t: t.timestamp)
@@ -272,7 +272,7 @@ def analyze_transactions(transactions: list[Transaction]) -> dict:
                 break
                 k += 1
 
-    # Timing rule 2: many transfers within 72 hours.
+
     for account, st in account_stats.items():
         txs = sorted(st["all_tx"], key=lambda t: t.timestamp)
         left = 0
@@ -283,7 +283,7 @@ def analyze_transactions(transactions: list[Transaction]) -> dict:
                 st["burst_detected"] = True
                 break
 
-    # Timing rule 3: fast multi-hop A->B->C->D where each hop happens within 2 hours.
+    
     outgoing_sorted_map: dict[str, list[Transaction]] = {
         account: sorted(txs, key=lambda t: t.timestamp) for account, txs in outgoing_by_account.items()
     }
@@ -401,7 +401,7 @@ def analyze_transactions(transactions: list[Transaction]) -> dict:
     for node in nodes:
         node["ringMember"] = node["id"] in ring_members
 
-    # Backward compatible alias used by existing frontend.
+
     fraud_rings = [
         {
             "ringType": ring["pattern"],
