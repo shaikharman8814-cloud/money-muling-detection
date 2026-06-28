@@ -150,8 +150,8 @@ def detect_fraud_rings(
     # Pattern: fan-in / fan-out
     accounts = set(incoming_by_account.keys()) | set(outgoing_by_account.keys())
     for account in accounts:
-        senders = {tx.sender for tx in incoming_by_account.get(account, [])}
-        receivers = {tx.receiver for tx in outgoing_by_account.get(account, [])}
+        senders = {tx.sender for tx in incoming_by_account.get(account,[])}
+        receivers = {tx.receiver for tx in outgoing_by_account.get(account,[])}
         if len(senders) >= 3 and len(receivers) >= 2:
             members = sorted(senders | receivers | {account})
             key = ("fan_in_out", tuple(members))
@@ -163,7 +163,7 @@ def detect_fraud_rings(
             key = ("fan_in", tuple(members))
             if key not in seen_keys:
                 seen_keys.add(key)
-                rings.append({"pattern": "fan_in", "members": members})
+                rings.append({"pattern": "fan_in", "members":members})
         elif len(receivers) >= 4:
             members = sorted(receivers | {account})
             key = ("fan_out", tuple(members))
